@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+    <title>lowersrc</title>
+    <style type="text/css" media="screen">
+        body{ 
+            margin: 0;
+            padding: 0;
+            background-color: #444;
+            font-family: helvetica, verdana, sans-serif;
+            color: #444;
+            
+        }
+        #container {
+            width:600px;
+            margin:0 auto;
+            background-color:#fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <img class="lowersrc" width="600" height="50"
+            data-text='lowersrc="Canvas-ly generated images"'
+            data-text-col="#000" />
+
+        <img class="lowersrc" width="150" height="100" data-bg="circle" style="float:right; padding:10px" />
+        <h1>Lowersrc</h1>
+        <h2>Fakey images for prototypin'</h2>
+        <img class="lowersrc" width="110" height="120" style="float:left;padding:10px"/>  
+        <p>
+            The idea is to use canvas to create fake images as placeholders 
+            in designs. So when you are mocking stuff up you can quickly add
+            fake images - like loren ipsum for images.
+        </p>
+        <p> To use it, you include a regular img tag, but with a width, height, and make faker image.
+            <img class="lowersrc" width="16" height="16" /> lol-d-lol.
+        </p>
+        <p>
+            (proposed) Features:
+            <ul>
+                <li>Options to customise the images:
+                    <ul>
+                        <li>rounded corners</li>
+                        <li>styles</li>
+                        <li>colours</li>
+                        <li>procedural patterns</li>
+                    </ul>
+                </li>
+                <li>Colour schemes</li>
+                <li>Set "defaults" for all images</li>
+            </ul>
+        </p>
+        <p>
+        <p>
+            Create a weird montage from parts of images to make "loren ipsum" of people for photo-like images
+        </p>
+        <p>Or something.</p>
+    </div>
+    <script src="lowersrc.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>
