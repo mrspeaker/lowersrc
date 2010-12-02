@@ -2,10 +2,10 @@
 
     /* Run onload */
     window.addEventListener("load", function(){
-        fimage.run();
+        lowersrc.run();
     }, false);
     
-    var fimage = {
+    var lowersrc = {
         run: function(){
             var images = this.findElements(document, "img", "lowersrc");
             each(images, function(item){
@@ -32,12 +32,12 @@
                 width: image.getAttribute("width"),
                 border: json["border"] || image.getAttribute("data-border"),
                 background: json["bg"] || image.getAttribute("data-bg"),
-                color: image.getAttribute("data-bg-col") || "#222",
+                color: image.getAttribute("data-bg-col"),
                 text: image.getAttribute("data-text"),
                 textColor: image.getAttribute("data-text-col" || "#fff")
             };
-            spec.border = render.border[ spec.border ] ? render.border[ spec.border ] : render.border.none;
-            spec.background = render.background[ spec.background ] ? render.background[ spec.background ] : render.background.random;
+            spec.border = render.border[ spec.border ] ? render.border[ spec.border ] : render.border.thin;
+            spec.background = render.background[ spec.background ] ? render.background[ spec.background ] : render.background.cross;
                         
             canvas.setAttribute("width", spec.width);
             canvas.setAttribute("height", spec.height);
@@ -60,6 +60,14 @@
     var render = {
         border: {
             none: function(canvas){
+                return canvas;
+            },
+            thin: function(canvas, specs){
+                var ctx = canvas.getContext("2d");
+                ctx.strokeStyle = "#ccc";
+                ctx.lineWidth = "2";
+                ctx.strokeRect(0,0,specs.width,specs.height);
+
                 return canvas;
             }
         },
@@ -88,13 +96,30 @@
                 ctx.closePath();
                 ctx.fill();
                 return canvas;
+            },
+            cross: function(canvas, specs){
+                var ctx = canvas.getContext("2d");
+                if(specs.color){
+                    ctx.fillStyle = specs.color;
+                    ctx.fillRect (0, 0, specs.width, specs.height);
+                }
+                ctx.strokeStyle = "#ccc";
+                ctx.lineWidth = "1";
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(specs.width, specs.height);
+                ctx.moveTo(specs.width, 0);
+                ctx.lineTo(0, specs.height);
+                ctx.closePath();
+                ctx.stroke();
+                return canvas;
             }
         },
         text: function(canvas, specs){
             var ctx = canvas.getContext("2d");
             ctx.fillStyle = specs.textColor;
-            ctx.font = "20pt Arial";
-            ctx.fillText(specs.text, 10, 30);
+            ctx.font = "10pt Arial";
+            ctx.fillText(specs.text, (specs.width / 2) - (specs.text.length * 3.5), (specs.height / 2) + 4);
             return canvas;
         },
         getRandom: function(){

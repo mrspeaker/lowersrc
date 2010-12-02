@@ -20,20 +20,19 @@
 <body>
     <div id="container">
         <img class="lowersrc" width="600" height="50"
-            data-text='lowersrc="Canvas-ly generated images"'
-            data-text-col="#000" />
+            data-text='lowersrc="Canvas-ly generated images"' />
 
-        <img class="lowersrc" width="150" height="100" data-bg="circle" style="float:right; padding:10px" />
+        <img class="lowersrc" width="150" height="100" data-bg="circle" data-border="none" style="float:right; padding:10px" />
         <h1>Lowersrc</h1>
         <h2>Fakey images for prototypin'</h2>
-        <img class="lowersrc" width="110" height="120" style="float:left;padding:10px"/>  
+        <img class="lowersrc" width="110" height="120" data-text="Main image" style="float:left;padding:10px"/>  
         <p>
             The idea is to use canvas to create fake images as placeholders 
             in designs. So when you are mocking stuff up you can quickly add
             fake images - like loren ipsum for images.
         </p>
         <p> To use it, you include a regular img tag, but with a width, height, and make faker image.
-            <img class="lowersrc" width="16" height="16" /> lol-d-lol.
+            <img class="lowersrc" data-bg-col="#eee" width="16" height="16" /> lol-d-lol.
         </p>
         <p>
             (proposed) Features:
