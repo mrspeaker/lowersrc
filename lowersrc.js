@@ -1,153 +1,243 @@
-(function(){
+/*
+Lowersrc - gen some images for protyping
 
+<img class="lowersrc" width="100" height="150" data-text="Main Image" />
+
+Attributes:
+width
+height
+data-bg [none, *solid]
+data-bg-col
+data-border [none, *solid]
+data-border-col
+data-fg [none, *cross, circle]
+data-fg-col (defaults to data-border-col)
+data-text "string..."
+data-text-col
+data-text-bg-col
+
+Notes:
+colours can be "{random}"
+set all with data-default="true"
+
+Todo:
+make it work with style set width
+override all defaults (need to add to specs)
+figure out better generic solution
+*/
+(function(){
     /* Run onload */
-    window.addEventListener("load", function(){
+    window.addEventListener( "load", function(){
         lowersrc.run();
-    }, false);
+    }, false );
     
     var lowersrc = {
+        selector: "img.lowersrc",
+        defaults: {
+            "text-col": "#222",
+            "border-col": "#777",
+            "bg-col": "#fff"
+        },
         run: function(){
-            var images = this.findElements(document, "img", "lowersrc");
-            each(images, function(item){
-                this.swapImage(item, this.createImage(item));
-            }, this);
+            this.setDefaults();
+
+            each( document.querySelectorAll( this.selector ), function( item ) {
+                this.swapImage( item, this.createImage( item ) );
+            }, this );
         },
-        findElements: function(container, elementType, className){
-            return reduce(container.getElementsByTagName(elementType), function(item){
-                return item.className == className;
-            });
+        setDefaults: function() {
+            var imageWithDefaults = document.querySelector( this.selector + "[data-default]" );
+            if( ! imageWithDefaults ){
+                return;
+            }
+            
+            each( imageWithDefaults.attributes, function( attr ) {
+                if( attr.specified && attr.name.indexOf( "data-" ) === 0) {
+                    this.defaults[ attr.name.slice( 5 ) ] = attr.value;
+                }
+            }, this );
         },
-        swapImage: function(oldImage, newImage){
+        swapImage: function( oldImage, newImage ){
             oldImage.setAttribute("src", newImage.toDataURL());
         },
-        createImage: function(image){
-            var canvas = document.createElement("canvas"),
-                json = image.getAttribute("data-$"),
-                spec;
-
-            json = json && JSON ? JSON.parse(json) : {};
-
-            spec = {
-                height: image.getAttribute("height"),
-                width: image.getAttribute("width"),
-                border: json["border"] || image.getAttribute("data-border"),
-                background: json["bg"] || image.getAttribute("data-bg"),
-                color: image.getAttribute("data-bg-col"),
-                text: image.getAttribute("data-text"),
-                textColor: image.getAttribute("data-text-col" || "#fff")
-            };
-            spec.border = render.border[ spec.border ] ? render.border[ spec.border ] : render.border.thin;
-            spec.background = render.background[ spec.background ] ? render.background[ spec.background ] : render.background.cross;
-                        
-            canvas.setAttribute("width", spec.width);
-            canvas.setAttribute("height", spec.height);
-
-            // * Render border
-            canvas = spec.border(canvas, spec);
-
-            // * Render background
-            canvas = spec.background(canvas, spec);
-
-            // * Render Text
-            if(spec.text){
-                canvas = render.text(canvas, spec);
-            };
+        getDefault: function(image, name, dfaultType, dfaultName){
+            if(typeof dfaultName !== "string"){
+                return image.getAttribute(name) || dfaultType;
+            }
+            return dfaultType[ image.getAttribute(name) ] ? 
+                dfaultType[ image.getAttribute(name) ] :
+                dfaultType[ dfaultName ];
+        },
+        createImage: function( image ) {
+            var _this = this,
+                canvas = document.createElement( "canvas" ),
+                def = function( name, defType, defName ) { 
+                    return _this.getDefault( image, name, defType, defName );
+                },
+                spec = {
+                    height: def( "height", "150" ),
+                    width: def( "width", "150" ),
+                    background: {
+                        method: def( "data-bg", render.background, "solid" ),
+                        color: def( "data-bg-col", this.defaults[ "bg-col" ] )
+                    },
+                    border: {
+                        method: def( "data-border", render.border, "solid" ),
+                        color: def( "data-border-col", this.defaults[ "border-col" ] )
+                    },
+                    foreground: {
+                        method: def( "data-fg", render.foreground, "cross" ),
+                        color: def( "data-fg-col", this.defaults[ "fg-col" ] || this.defaults[ "border-col" ] )
+                    },
+                    text: {
+                        content: def( "data-text", "" ),
+                        color: def( "data-text-col", this.defaults[ "text-col" ] ),
+                        backgroundColor: def( "data-text-bg-col", this.defaults[ "bg-col" ])
+                    }
+                };
+            spec.width = getDistance(image, spec.width);
+            spec.height = getDistance(image, spec.height);
+            
+            // * Render
+            canvas.setAttribute( "width", getDistance(image, spec.width) );
+            canvas.setAttribute( "height", getDistance(image, spec.height) );
+            canvas = spec.background.method( canvas, spec );
+            canvas = spec.foreground.method( canvas, spec );
+            canvas = spec.border.method( canvas, spec );
+            canvas = render.text( canvas, spec );
             return canvas;
         }
     };
-    
+
     /* Renderers */
     var render = {
         border: {
-            none: function(canvas){
+            none: function( canvas ){
                 return canvas;
             },
-            thin: function(canvas, specs){
-                var ctx = canvas.getContext("2d");
-                ctx.strokeStyle = "#ccc";
+            solid: function( canvas, specs ) {
+                var ctx = canvas.getContext( "2d" );
+                ctx.strokeStyle = render.processColor( specs.border.color );
                 ctx.lineWidth = "2";
-                ctx.strokeRect(0,0,specs.width,specs.height);
-
+                ctx.strokeRect( 0, 0, specs.width, specs.height );
                 return canvas;
             }
         },
         background: {
-            none: function(canvas){
+            none: function ( canvas ){
                 return canvas;
             },
-            random: function(canvas, specs){
-                var ctx = canvas.getContext("2d");
-                ctx.fillStyle = render.getRandom();
-                ctx.fillRect (0, 0, specs.width, specs.height);
-                return canvas;
-            },
-            solid: function(canvas, specs){
-                var ctx = canvas.getContext("2d");
-                ctx.fillStyle = specs.color;
-                ctx.fillRect (0, 0, specs.width, specs.height);
-                return canvas;
-            },
-            circle: function(canvas, specs){
-                var rad = specs.width / 2;
-                var ctx = canvas.getContext("2d");
-                ctx.fillStyle = render.getRandom();
-                ctx.beginPath();
-                ctx.arc( rad, rad, rad, 0, Math.PI * 2, true);
-                ctx.closePath();
-                ctx.fill();
-                return canvas;
-            },
-            cross: function(canvas, specs){
-                var ctx = canvas.getContext("2d");
-                if(specs.color){
-                    ctx.fillStyle = specs.color;
-                    ctx.fillRect (0, 0, specs.width, specs.height);
-                }
-                ctx.strokeStyle = "#ccc";
-                ctx.lineWidth = "1";
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.lineTo(specs.width, specs.height);
-                ctx.moveTo(specs.width, 0);
-                ctx.lineTo(0, specs.height);
-                ctx.closePath();
-                ctx.stroke();
+            solid: function ( canvas, specs ) {
+                var ctx = canvas.getContext( "2d" );
+                ctx.fillStyle = render.processColor( specs.background.color );
+                ctx.fillRect ( 0, 0, specs.width, specs.height );
                 return canvas;
             }
         },
-        text: function(canvas, specs){
-            var ctx = canvas.getContext("2d");
-            ctx.fillStyle = specs.textColor;
+        foreground: {
+            none: function(canvas){
+                return canvas;
+            },
+            cross: function( canvas, specs ) {
+                var ctx = canvas.getContext( "2d" );
+                ctx.strokeStyle = render.processColor( specs.foreground.color );
+                ctx.lineWidth = "1";
+                ctx.beginPath();
+                ctx.moveTo( 0, 0 );
+                ctx.lineTo( specs.width, specs.height );
+                ctx.moveTo( specs.width, 0 );
+                ctx.lineTo( 0, specs.height );
+                ctx.closePath();
+                ctx.stroke();
+                return canvas;
+            },
+            circle: function( canvas, specs ){
+                var ctx = canvas.getContext( "2d" ),
+                    height = parseInt( specs.height, 10 ),
+                    width = parseInt( specs.width, 10 ),
+                    halfHeight = height / 2,
+                    halfWidth = width / 2;
+
+                ctx.fillStyle = render.processColor( specs.foreground.color )
+                ctx.beginPath();
+                ctx.moveTo( halfWidth, 0 );
+                ctx.bezierCurveTo( 
+                    - halfWidth / 3, 0,
+                    - halfWidth / 3, height,
+                    halfWidth, height);
+                ctx.bezierCurveTo( 
+                    width + ( halfWidth / 3 ), height,
+                    width + ( halfWidth / 3 ), 0,
+                    halfWidth, 0 );
+                ctx.fill();
+                ctx.closePath();
+                
+                return canvas;
+            }
+        },
+        text: function( canvas, specs ) {
+            var ctx = canvas.getContext( "2d" ),
+                content = specs.text.content;
+            if( ! content ){
+                return canvas;
+            }
+            
             ctx.font = "10pt Arial";
-            ctx.fillText(specs.text, (specs.width / 2) - (specs.text.length * 3.5), (specs.height / 2) + 4);
+            var width = ctx.measureText ? ctx.measureText( content ).width : content.length * 7,
+                top = ( specs.height / 2 ) + 4,
+                left = ( specs.width / 2 ) - ( width / 2 );
+
+            if( specs.text.backgroundColor ){
+                ctx.fillStyle = specs.text.backgroundColor;
+                ctx.fillRect ( left - 5, top - 15, width + 10, 20 );
+            }
+            ctx.fillStyle = render.processColor( specs.text.color );
+            ctx.fillText( content, left, top );
             return canvas;
         },
-        getRandom: function(){
-            return "rgb(" + (~~(Math.random()*255)) + "," + (~~(Math.random()*255)) + "," + (~~(Math.random()*255)) + ")";
+        processColor: function( color ) {
+            if( color == "{random}" ) {
+                return this.getRandom();
+            }
+            return color;
+        },
+        getRandom: function() {
+            return "rgb(" 
+                + ( ~~( Math.random() * 255 ) ) 
+                + "," + ( ~~( Math.random() * 255 ) ) 
+                + "," + ( ~~( Math.random() * 255 ) ) 
+                + ")";
         }
     };
     
-    /* Functional helper methods (so it works on iPhone3.2) */
-    var each = function(coll, func, context){
-            for(var i = 0; i < coll.length; i++){
-                func.call(context||this,coll[i]);
-            } 
+    var getStyle = function( el,styleProp ){
+            var compStyle;
+            if ( el.currentStyle ){
+                compStyle = el.currentStyle[ styleProp ];
+            }
+            else if ( window.getComputedStyle ) {
+                compStyle = document.defaultView.getComputedStyle( el, null ).getPropertyValue( styleProp );
+            }
+            return compStyle;
         },
-        map = function(coll, func, context){
-            var mapped = [];
-            each(coll, function(item){
-                mapped.push(func(item));
-            },context);
-            return mapped;
+        getDistance = function( item, distance ){
+            if( distance.indexOf( "%" ) === -1 || ! item.parentNode ) {
+                return distance;
+            }
+            var container = item.parentNode,
+                width = getStyle( container, "width" );
+            return "" + ( parseInt( width, 10 ) * ( parseInt( distance, 10 ) / 100 ) );
         },
-        reduce = function(coll, func, context){
-            var matched = [];
-            each(coll, function(item){
-                if(func(item)){
-                    matched.push(item);
+        /* Functional helper methods (so it works on iPhone3.2) */
+        each = function( coll, func, context ) {
+            for ( var i = 0; i < coll.length; i++ ) {
+                var ret = func.call( context || this, coll[ i ] );
+                if ( typeof ret == "boolean" ){
+                    if ( ret ) {
+                        continue;
+                    }
+                    break;
                 }
-            }, context);
-            return matched;
+            }
         };
-
 })();
