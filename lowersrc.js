@@ -1,6 +1,7 @@
 /*
-Lowersrc - gen some images for protyping
+Lowersrc - dynamically created image placeholders: "loren ipsum" for images
 
+v0.1
 <img class="lowersrc" width="100" height="150" data-text="Main Image" />
 
 Attributes:
@@ -23,7 +24,10 @@ set all with data-default="true"
 Todo:
 make it work with style set width
 override all defaults (need to add to specs)
-figure out better generic solution
+arch: figure out better generic solution
+maybe take any img without src as the source?
+wrap text
+test text-measuring in agents
 */
 (function(){
     /* Run onload */
