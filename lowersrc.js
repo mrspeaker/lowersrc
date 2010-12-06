@@ -8,7 +8,7 @@ Attributes:
 width
 height
 data-bg [none, *solid]
-data-bg-col
+data-bg-col 
 data-border [none, *solid]
 data-border-col
 data-fg [none, *cross, circle]
@@ -36,13 +36,22 @@ test text-measuring in agents
         lowersrc.run();
     }, false );
     
+    var defaultAttrs = {
+        "width": 120,
+        "height": 150,
+        "data-bg": "solid",
+        "data-bg-col": "#f5f5f5",
+        "data-fg": "cross",
+        "data-fg-col": null,
+        "data-border": "solid",
+        "data-border-col": "#ccc",
+        "data-text": null,
+        "data-text-col": "#222",
+        "data-text-bg-col": null
+    };
+    
     var lowersrc = {
         selector: "img.lowersrc",
-        defaults: {
-            "text-col": "#222",
-            "border-col": "#777",
-            "bg-col": "#fff"
-        },
         run: function(){
             this.setDefaults();
 
@@ -55,54 +64,62 @@ test text-measuring in agents
             if( ! imageWithDefaults ){
                 return;
             }
-            
             each( imageWithDefaults.attributes, function( attr ) {
                 if( attr.specified && attr.name.indexOf( "data-" ) === 0) {
-                    this.defaults[ attr.name.slice( 5 ) ] = attr.value;
+                    defaultAttrs[ attr.name ] = attr.value;
                 }
             }, this );
+            defaultAttrs[ "data-text" ] = ""; // Don't add default text message
         },
         swapImage: function( oldImage, newImage ){
             oldImage.setAttribute("src", newImage.toDataURL());
         },
-        getDefault: function(image, name, dfaultType, dfaultName){
-            if(typeof dfaultName !== "string"){
-                return image.getAttribute(name) || dfaultType;
+        getDefault: function(settings, name, method){
+            if(!method){
+                return settings[ name ];
             }
-            return dfaultType[ image.getAttribute(name) ] ? 
-                dfaultType[ image.getAttribute(name) ] :
-                dfaultType[ dfaultName ];
+            return method[ settings[ name ] ];
         },
         createImage: function( image ) {
             var _this = this,
                 canvas = document.createElement( "canvas" ),
+                imageSettings = mergeObj( mergeObj( {}, defaultAttrs ), getAttr( image ) ),
                 def = function( name, defType, defName ) { 
-                    return _this.getDefault( image, name, defType, defName );
+                    return _this.getDefault( imageSettings, name, defType, defName );
                 },
-                spec = {
-                    height: def( "height", "150" ),
-                    width: def( "width", "120" ),
+                spec;
+            
+            // Set some "default" colours if not set
+            if(!imageSettings[ "data-fg-col" ]){
+                imageSettings[ "data-fg-col" ] = imageSettings[ "data-border-col" ];
+            }
+            if(!imageSettings[ "data-text-bg-col" ]){
+                imageSettings[ "data-text-bg-col" ] = imageSettings[ "data-bg-col" ];
+            }
+            spec = {
+                    height: def( "height" ),
+                    width: def( "width" ),
                     background: {
-                        method: def( "data-bg", render.background, "solid" ),
-                        color: def( "data-bg-col", this.defaults[ "bg-col" ] )
+                        method: def( "data-bg", render.background ),
+                        color: def( "data-bg-col" )
                     },
                     border: {
-                        method: def( "data-border", render.border, "solid" ),
-                        color: def( "data-border-col", this.defaults[ "border-col" ] )
+                        method: def( "data-border", render.border ),
+                        color: def( "data-border-col" )
                     },
                     foreground: {
-                        method: def( "data-fg", render.foreground, "cross" ),
-                        color: def( "data-fg-col", this.defaults[ "fg-col" ] || this.defaults[ "border-col" ] )
+                        method: def( "data-fg", render.foreground ),
+                        color: def( "data-fg-col" )
                     },
                     text: {
                         content: def( "data-text", "" ),
-                        color: def( "data-text-col", this.defaults[ "text-col" ] ),
-                        backgroundColor: def( "data-text-bg-col", this.defaults[ "bg-col" ])
+                        color: def( "data-text-col" ),
+                        backgroundColor: def( "data-text-bg-col" )
                     }
                 };
             spec.width = getDistance(image, spec.width);
             spec.height = getDistance(image, spec.height);
-            
+
             // * Render
             canvas.setAttribute( "width", getDistance(image, spec.width) );
             canvas.setAttribute( "height", getDistance(image, spec.height) );
@@ -163,7 +180,7 @@ test text-measuring in agents
                     halfHeight = height / 2,
                     halfWidth = width / 2;
 
-                ctx.fillStyle = render.processColor( specs.foreground.color )
+                ctx.fillStyle = render.processColor( specs.foreground.color );
                 ctx.beginPath();
                 ctx.moveTo( halfWidth, 0 );
                 ctx.bezierCurveTo( 
@@ -226,6 +243,7 @@ test text-measuring in agents
             return compStyle;
         },
         getDistance = function( item, distance ){
+            distance = "" + distance;
             if( distance.indexOf( "%" ) === -1 || ! item.parentNode ) {
                 return distance;
             }
@@ -233,6 +251,22 @@ test text-measuring in agents
                 width = getStyle( container, "width" );
             return "" + ( parseInt( width, 10 ) * ( parseInt( distance, 10 ) / 100 ) );
         },
+        getAttr = function(el){
+            var res = {};
+            each( el.attributes, function( attr ) {
+                if( attr.specified && defaultAttrs[ attr.name ] !== undefined ) {
+                    res[ attr.name ] = attr.value; 
+                }
+            }, this );
+            return res;
+        },
+        mergeObj = function(src, dest){
+            for( var attr in dest ){
+                src[ attr ] = dest[ attr ];
+            }
+            return src;
+        },
+        
         /* Functional helper methods (so it works on iPhone3.2) */
         each = function( coll, func, context ) {
             for ( var i = 0; i < coll.length; i++ ) {
