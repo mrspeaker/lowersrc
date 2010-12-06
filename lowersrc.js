@@ -20,6 +20,7 @@ data-text-bg-col
 Notes:
 colours can be "{random}"
 set all with data-default="true"
+can copy attributes from another image with data-copy="image-id" (where src image has id "image-id")
 
 Todo:
 copy image via id - do data-copy="blah" will copy the <img id="blah" /> settings
@@ -59,64 +60,60 @@ test text-measuring in agents
                 this.swapImage( item, this.createImage( item ) );
             }, this );
         },
-        setDefaults: function() {
-            var imageWithDefaults = document.querySelector( this.selector + "[data-default]" );
-            if( ! imageWithDefaults ){
-                return;
-            }
-            each( imageWithDefaults.attributes, function( attr ) {
-                if( attr.specified && attr.name.indexOf( "data-" ) === 0) {
-                    defaultAttrs[ attr.name ] = attr.value;
-                }
-            }, this );
-            defaultAttrs[ "data-text" ] = ""; // Don't add default text message
-        },
         swapImage: function( oldImage, newImage ){
             oldImage.setAttribute("src", newImage.toDataURL());
         },
-        getDefault: function(settings, name, method){
-            if(!method){
-                return settings[ name ];
+        getSettings: function( image ) {
+            var settings = mergeObj( {}, defaultAttrs ),
+                toCopy = image.getAttribute( 'data-copy' ),
+                toCopyImg;
+            // Override default settings with attributes from image referenced in data-copy
+            if( toCopy ){
+                toCopyImg = document.getElementById( toCopy );
+                if ( toCopyImg ) {
+                    settings = mergeObj( settings, getAttr( toCopyImg ) );
+                }
             }
-            return method[ settings[ name ] ];
+            // Override settings with image attributes
+            return mergeObj( settings, getAttr( image ) );
         },
         createImage: function( image ) {
             var _this = this,
                 canvas = document.createElement( "canvas" ),
-                imageSettings = mergeObj( mergeObj( {}, defaultAttrs ), getAttr( image ) ),
-                def = function( name, defType, defName ) { 
-                    return _this.getDefault( imageSettings, name, defType, defName );
+                settings = this.getSettings( image ),
+                def = function( name, method ) { 
+                    if(!method){
+                        return settings[ name ];
+                    }
+                    return method[ settings[ name ] ];
                 },
                 spec;
             
             // Set some "default" colours if not set
-            if(!imageSettings[ "data-fg-col" ]){
-                imageSettings[ "data-fg-col" ] = imageSettings[ "data-border-col" ];
-            }
-            if(!imageSettings[ "data-text-bg-col" ]){
-                imageSettings[ "data-text-bg-col" ] = imageSettings[ "data-bg-col" ];
-            }
+            settings[ "data-fg-col" ] = settings[ "data-fg-col" ] || settings[ "data-border-col" ];
+            settings[ "data-text-bg-col" ] = settings[ "data-text-bg-col" ] || settings[ "data-bg-col" ];
+
             spec = {
-                    height: def( "height" ),
-                    width: def( "width" ),
-                    background: {
-                        method: def( "data-bg", render.background ),
-                        color: def( "data-bg-col" )
-                    },
-                    border: {
-                        method: def( "data-border", render.border ),
-                        color: def( "data-border-col" )
-                    },
-                    foreground: {
-                        method: def( "data-fg", render.foreground ),
-                        color: def( "data-fg-col" )
-                    },
-                    text: {
-                        content: def( "data-text", "" ),
-                        color: def( "data-text-col" ),
-                        backgroundColor: def( "data-text-bg-col" )
-                    }
-                };
+                height: def( "height" ),
+                width: def( "width" ),
+                background: {
+                    method: def( "data-bg", render.background ),
+                    color: processColor( def( "data-bg-col" ) )
+                },
+                border: {
+                    method: def( "data-border", render.border ),
+                    color: processColor( def( "data-border-col" ) )
+                },
+                foreground: {
+                    method: def( "data-fg", render.foreground ),
+                    color: processColor( def( "data-fg-col" ) )
+                },
+                text: {
+                    content: def( "data-text", "" ),
+                    color: def( "data-text-col" ),
+                    backgroundColor: processColor( def( "data-text-bg-col" ) )
+                }
+            };
             spec.width = getDistance(image, spec.width);
             spec.height = getDistance(image, spec.height);
 
@@ -128,6 +125,18 @@ test text-measuring in agents
             canvas = spec.border.method( canvas, spec );
             canvas = render.text( canvas, spec );
             return canvas;
+        },
+        setDefaults: function() {
+            var imageWithDefaults = document.querySelector( this.selector + "[data-default]" );
+            if( ! imageWithDefaults ){
+                return;
+            }
+            each( imageWithDefaults.attributes, function( attr ) {
+                if( attr.specified && attr.name.indexOf( "data-" ) === 0) {
+                    defaultAttrs[ attr.name ] = attr.value;
+                }
+            }, this );
+            defaultAttrs[ "data-text" ] = ""; // Don't add default text message
         }
     };
 
@@ -139,7 +148,7 @@ test text-measuring in agents
             },
             solid: function( canvas, specs ) {
                 var ctx = canvas.getContext( "2d" );
-                ctx.strokeStyle = render.processColor( specs.border.color );
+                ctx.strokeStyle = specs.border.color;
                 ctx.lineWidth = "2";
                 ctx.strokeRect( 0, 0, specs.width, specs.height );
                 return canvas;
@@ -151,7 +160,7 @@ test text-measuring in agents
             },
             solid: function ( canvas, specs ) {
                 var ctx = canvas.getContext( "2d" );
-                ctx.fillStyle = render.processColor( specs.background.color );
+                ctx.fillStyle = specs.background.color;
                 ctx.fillRect ( 0, 0, specs.width, specs.height );
                 return canvas;
             }
@@ -162,7 +171,7 @@ test text-measuring in agents
             },
             cross: function( canvas, specs ) {
                 var ctx = canvas.getContext( "2d" );
-                ctx.strokeStyle = render.processColor( specs.foreground.color );
+                ctx.strokeStyle = specs.foreground.color;
                 ctx.lineWidth = "1";
                 ctx.beginPath();
                 ctx.moveTo( 0, 0 );
@@ -180,7 +189,7 @@ test text-measuring in agents
                     halfHeight = height / 2,
                     halfWidth = width / 2;
 
-                ctx.fillStyle = render.processColor( specs.foreground.color );
+                ctx.fillStyle = specs.foreground.color;
                 ctx.beginPath();
                 ctx.moveTo( halfWidth, 0 );
                 ctx.bezierCurveTo( 
@@ -213,25 +222,13 @@ test text-measuring in agents
                 ctx.fillStyle = specs.text.backgroundColor;
                 ctx.fillRect ( left - 5, top - 15, width + 10, 20 );
             }
-            ctx.fillStyle = render.processColor( specs.text.color );
+            ctx.fillStyle = specs.text.color;
             ctx.fillText( content, left, top );
             return canvas;
-        },
-        processColor: function( color ) {
-            if( color == "{random}" ) {
-                return this.getRandom();
-            }
-            return color;
-        },
-        getRandom: function() {
-            return "rgb(" 
-                + ( ~~( Math.random() * 255 ) ) 
-                + "," + ( ~~( Math.random() * 255 ) ) 
-                + "," + ( ~~( Math.random() * 255 ) ) 
-                + ")";
         }
     };
-    
+   
+    // Helpers 
     var getStyle = function( el,styleProp ){
             var compStyle;
             if ( el.currentStyle ){
@@ -260,14 +257,25 @@ test text-measuring in agents
             }, this );
             return res;
         },
-        mergeObj = function(src, dest){
+        mergeObj = function(src, dest) {
             for( var attr in dest ){
                 src[ attr ] = dest[ attr ];
             }
             return src;
         },
-        
-        /* Functional helper methods (so it works on iPhone3.2) */
+        processColor =  function( color ) {
+            if( color == "{random}" ) {
+                return getRandomColor();
+            }
+            return color;
+        },
+        getRandomColor = function() {
+            return "rgb(" 
+                + ( ~~( Math.random() * 255 ) ) 
+                + "," + ( ~~( Math.random() * 255 ) ) 
+                + "," + ( ~~( Math.random() * 255 ) ) 
+                + ")";
+        },
         each = function( coll, func, context ) {
             for ( var i = 0; i < coll.length; i++ ) {
                 var ret = func.call( context || this, coll[ i ] );
