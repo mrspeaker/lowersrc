@@ -1,35 +1,11 @@
 /*
-Lowersrc - dynamically created image placeholders: "loren ipsum" for images
+    lowersrc: "Loren Ipsum" for images
+    Dynamically created image placeholders.
+    v1.0 by Mr Speaker (www.mrspeaker.net)
+    Info: http://mrspeaker.github.com/lowersrc/
+    Repo: https://github.com/mrspeaker/lowersrc/
 
-v0.1
-<img class="lowersrc" width="100" height="150" data-text="Main Image" />
-
-Attributes:
-width
-height
-data-bg [none, *solid]
-data-bg-col 
-data-border [none, *solid]
-data-border-col
-data-fg [none, *cross, circle]
-data-fg-col (defaults to data-border-col)
-data-text "string..."
-data-text-col
-data-text-bg-col
-
-Notes:
-colours can be "{random}"
-set all with data-default="true"
-can copy attributes from another image with data-copy="image-id" (where src image has id "image-id")
-
-Todo:
-copy image via id - do data-copy="blah" will copy the <img id="blah" /> settings
-make it work with style set width
-override all defaults (need to add to specs)
-arch: figure out better generic solution
-maybe take any img without src as the source?
-wrap text
-test text-measuring in agents
+    Usage: <img class="lowersrc" width="100" height="150" data-text="Main Image" />
 */
 (function(){
     /* Run onload */
@@ -37,6 +13,7 @@ test text-measuring in agents
         lowersrc.run();
     }, false );
     
+    // 
     var defaultAttrs = {
         "width": 120,
         "height": 150,
@@ -61,7 +38,7 @@ test text-measuring in agents
             }, this );
         },
         swapImage: function( oldImage, newImage ){
-            oldImage.setAttribute("src", newImage.toDataURL());
+            oldImage.setAttribute( "src", newImage.toDataURL() );
         },
         getSettings: function( image ) {
             var settings = mergeObj( {}, defaultAttrs ),
@@ -114,8 +91,8 @@ test text-measuring in agents
                     backgroundColor: processColor( def( "data-text-bg-col" ) )
                 }
             };
-            spec.width = getDistance(image, spec.width);
-            spec.height = getDistance(image, spec.height);
+            spec.width = getDistance( image, spec.width );
+            spec.height = getDistance( image, spec.height );
 
             // * Render
             canvas.setAttribute( "width", getDistance(image, spec.width) );
