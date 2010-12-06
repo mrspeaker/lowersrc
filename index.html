@@ -45,6 +45,19 @@
             overflow: hidden;
             height: 90px;
         }
+        #getit{
+            float:right;
+        }
+        #getit p a{
+            background-color: #520;
+            color: #fff;
+            font-size: 11pt;
+            text-decoration: none;
+            padding: 6px;
+            -webkit-border-radius: 9px;
+            -moz-border-radius: 9px;
+            border-radius: 9px;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +66,12 @@
             <img id="head" class="lowersrc" width="100%" height="90" data-text='lowersrc: Loren Ipsum for images' />
         </div>
         <div id="content">
-            <img class="lowersrc" data-text="Main image" style="float:right;" />
+            <div id="getit">
+                <p>
+                   <a href="https://github.com/mrspeaker/lowersrc/raw/master/lowersrc.js">Download Now!</a> 
+                </p>
+                <img class="lowersrc" data-text="Main image" />
+            </div>
             <h1>lowersrc</h1>
             <h2>Loren Ipsum for images</h2>
             <p>
@@ -68,7 +86,7 @@
                 add text, change colours, change patterns - whatever works for your wireframe.
                 Because they are rendered as regular HTML images, they can also be styled
                 and targeted like regular images.
-                <img class="lowersrc" width="16" height="16" /> They can be any size you need! 120 x 150, 80 x 80, 12 x 103... you name it! 
+                <img class="lowersrc" width="16" height="16" /> They can be any size you need! 120 x 150, 80 x 80, 12 x 103... you name it!
             </p>
             <img class="lowersrc" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>
             <h2>Using lowersrc</h2>
