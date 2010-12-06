@@ -15,6 +15,9 @@
             width:600px;
             margin:0 auto;
             background-color:#fff;
+            -moz-box-shadow: 0px 0px 10px #222;
+            -webkit-box-shadow: 0px 0px 10px #222;
+            box-shadow: 0px 0px 10px #222;
         }
         #content{
             padding: 10px;
@@ -35,10 +38,10 @@
 <body>
     <div id="container">
         <div id="header">
-            <img class="lowersrc" width="100%" height="90" data-text='lowersrc: Loren Ipsum for images' />
+            <img id="head" class="lowersrc" width="100%" height="90" data-text='lowersrc: Loren Ipsum for images' />
         </div>
         <div id="content">
-            <img class="lowersrc" data-text="Main image"  style="float:right;" />
+            <img class="lowersrc" data-text="Main image" style="float:right;" />
             <h1>lowersrc</h1>
             <h2>Loren Ipsum for images</h2>
             <p>
@@ -54,7 +57,7 @@
                 and targeted like regular images.
                 <img class="lowersrc" width="16" height="16" /> They can be any size you need.
             </p>
-            <img class="lowersrc" width="110" height="120" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>  
+            <img class="lowersrc" id="circ" width="110" height="120" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>  
             <h2>Using lowersrc</h2>
             <p>
                 Add a regular ol' image tag, and give it the "lowersrc" class. You can customise the output by setting attributes:<pre>
@@ -75,11 +78,13 @@
                             <li><strong>Colours</strong>: can be any valid HTML colour, or the string "{random}" for a random colour</li>
                         </ul>
                     </li>
-                    <li>Set some "defaults" for all images based on the setting of one image (add the attribute data-default="true" to one of the images)</li>
-                    <li>Allow % dimensions</li>
+                    <li>Ability to use % in the dimensions: <code>width="100%"</code></li>
+                    <li>Create some default settings for all images based on the setting of one image: Add <code>data-default="true"</code> to the "master" image.</li>
+                    <li>Copy another image settings: <code>data-copy="image-id"</code> (where the other image has id "image-id")</li>
                 </ul>
             </p>
         </div>
+        <img class="lowersrc" data-copy="head" data-text="(settings copied from header)" />
     </div>
     <script src="https://github.com/mrspeaker/lowersrc/raw/master/lowersrc.js" type="text/javascript" charset="utf-8"></script>
 </body>
