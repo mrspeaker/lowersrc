@@ -22,6 +22,7 @@ colours can be "{random}"
 set all with data-default="true"
 
 Todo:
+copy image via id - do data-copy="blah" will copy the <img id="blah" /> settings
 make it work with style set width
 override all defaults (need to add to specs)
 arch: figure out better generic solution
