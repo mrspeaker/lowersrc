@@ -6,54 +6,87 @@
             margin: 0;
             padding: 0;
             background-color: #444;
-            font-family: helvetica, verdana, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial;
+            font-size: 14px;
+            line-height: 22px;
             color: #444;
-            
         }
         #container {
             width:600px;
             margin:0 auto;
             background-color:#fff;
         }
+        #content{
+            padding: 10px;
+        }
+        h1, h2, h3{
+            font-family: "Palatino Linotype", "Book Antiqua", Palatino, FreeSerif, serif;
+            margin: 0;
+            padding: 0;
+        }
+        h2{
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
     <div id="container">
-        <img class="lowersrc" width="600" height="50"
-            data-text='lowersrc="Canvas-ly generated images"' />
-
-        <img class="lowersrc" width="150" height="100" data-bg="circle" data-border="none" style="float:right; padding:10px" />
-        <h1>Lowersrc</h1>
-        <h2>Fakey images for prototypin'</h2>
-        <img class="lowersrc" width="110" height="120" data-text="Main image" style="float:left;padding:10px"/>  
-        <p>
-            The idea is to use canvas to create fake images as placeholders 
-            in designs. So when you are mocking stuff up you can quickly add
-            fake images - like loren ipsum for images.
-        </p>
-        <p> To use it, you include a regular img tag, but with a width, height, and make faker image.
-            <img class="lowersrc" data-bg-col="#eee" width="16" height="16" /> lol-d-lol.
-        </p>
-        <p>
-            (proposed) Features:
-            <ul>
-                <li>Options to customise the images:
-                    <ul>
-                        <li>rounded corners</li>
-                        <li>styles</li>
-                        <li>colours</li>
-                        <li>procedural patterns</li>
-                    </ul>
-                </li>
-                <li>Colour schemes</li>
-                <li>Set "defaults" for all images</li>
-            </ul>
-        </p>
-        <p>
-        <p>
-            Create a weird montage from parts of images to make "loren ipsum" of people for photo-like images
-        </p>
-        <p>Or something.</p>
+        <div id="header">
+            <img class="lowersrc" data-default="true" data-bg-col="#eee" width="100%" height="90"
+                data-text='lowersrc: quick images for prototyping' />
+        </div>
+        <div id="content">
+            <img class="lowersrc" data-text="Main image"  style="float:right;" />
+            <h1>lowersrc</h1>
+            <h2>Loren Ipsum for images</h2>
+            <p>
+                Easily create fake images as placeholders for live protyping 
+                designs. Simply add regular-old HTML image tags - lowersrc will dynamically
+                create the contents of the image (based on your customisations) so you
+                can get on with the layout.
+            </p>
+            <p> To use it, you include a regular img tag, but with a width, height, and make faker image.
+                <img class="lowersrc" data-bg-col="#eee" width="16" height="16" /> lol-d-lol.
+            </p>
+            <img class="lowersrc" width="110" height="120" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>  
+            <h2>Using lowersrc</h2>
+            <p>
+                Add a regular ol' image tag, and give it the "lowersrc" class. You can customise the output by setting attributes:<pre>
+&lt;img class="lowersrc" /&gt;
+&lt;img class="lowersrc" width="100" height="150" /&gt;
+&lt;img class="lowersrc" data-text="My Image" /&gt;
+</pre>
+            </p>
+            <p>
+                <h2>Features</h2>
+                <ul>
+                    <li>Options to customise the images:
+                        <ul>
+                            <li>colours</li>
+                        </ul>
+                    </li>
+                    <li>Colour schemes</li>
+                    <li>Set "defaults" for all images</li>
+                </ul>
+            </p>
+            <p>
+                <h2>ToDo:</h2>
+                <ul>
+                    <li>Options to customise the images:
+                        <ul>
+                            <li>rounded corners</li>
+                            <li>styles</li>
+                            <li>procedural patterns</li>
+                        </ul>
+                    </li>
+                    <li>Colour schemes</li>
+                </ul>
+            </p>
+            <p>
+                Also... Create a weird montage from parts of images to make "loren ipsum" of people for photo-like images
+            </p>
+            <p>Or something.</p>
+        </div>
     </div>
     <script src="https://github.com/mrspeaker/lowersrc/raw/master/lowersrc.js" type="text/javascript" charset="utf-8"></script>
 </body>
