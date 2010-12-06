@@ -76,7 +76,7 @@ figure out better generic solution
                 },
                 spec = {
                     height: def( "height", "150" ),
-                    width: def( "width", "150" ),
+                    width: def( "width", "120" ),
                     background: {
                         method: def( "data-bg", render.background, "solid" ),
                         color: def( "data-bg-col", this.defaults[ "bg-col" ] )
