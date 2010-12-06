@@ -57,19 +57,20 @@
             <h1>lowersrc</h1>
             <h2>Loren Ipsum for images</h2>
             <p>
-                Easily create fake images as placeholders for live protyping 
-                designs. Simply add regular-old HTML image tags - lowersrc will dynamically
-                create the contents of the image (based on your customisations) so you
-                can get on with the layout.
+                Wow! Creating fake-o images as placeholders while you prototype has never 
+                been so easy! Simply add some regular-ol' HTML image tags, and lowersrc will 
+                spring to work - dynamically creating images (based on your customisations) 
+                - leaving you to get on with your layout.
             </p>
-            <p>Add the <a href="https://github.com/mrspeaker/lowersrc/raw/master/lowersrc.js">lowersrc</a> script to your project, and add an image with a "lowersrc" class. 
-                The default image is a rectangle with a thin cross through it - but you can
+            <p>To get started, include the <a href="https://github.com/mrspeaker/lowersrc/raw/master/lowersrc.js">lowersrc</a> script in your project, add
+                an image or two with the "lowersrc" class, and Hey Presto! Images a-go-go. 
+                The default design is the ol' trusy rectangle-with-a-cross-through-it - but you can
                 add text, change colours, change patterns - whatever works for your wireframe.
                 Because they are rendered as regular HTML images, they can also be styled
                 and targeted like regular images.
-                <img class="lowersrc" width="16" height="16" /> They can be any size you need.
+                <img class="lowersrc" width="16" height="16" /> They can be any size you need! 120 x 150, 80 x 80, 12 x 103... you name it! 
             </p>
-            <img class="lowersrc" id="circ" width="110" height="120" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>  
+            <img class="lowersrc" data-fg="circle" data-border="none" data-text="ooh! A circle" style="float:left;padding:10px"/>
             <h2>Using lowersrc</h2>
             <p>
                 Add a regular ol' image tag, and give it the "lowersrc" class. You can customise the output by setting attributes:<pre>
@@ -81,7 +82,7 @@
             <p>
                 <h2>Features</h2>
                 <ul>
-                    <li>Options to customise the images:
+                    <li>Customise your images in a limited number of ways!
                         <ul>
                             <li><strong>Background</strong>: <code>data-bg="none|solid" data-bg-col="#f0f|{random}"</code></li>
                             <li><strong>Border</strong>: <code>data-border="none|solid" data-border-col="#f0f|{random}"</code></li>
@@ -90,10 +91,11 @@
                             <li><strong>Colours</strong>: can be any valid HTML colour, or the string "{random}" for a random colour</li>
                         </ul>
                     </li>
-                    <li>Ability to use % in the dimensions: <code>width="100%"</code></li>
+                    <li>Not a fan of px? Bust out some %s!: <code>width="100%"</code></li>
                     <li>Create some default settings for all images based on the setting of one image: Add <code>data-default="true"</code> to the "master" image.</li>
-                    <li>Copy another image settings: <code>data-copy="image-id"</code> (where the other image has id "image-id")</li>
+                    <li>Copy another image settings: <code>data-copy="image-id"</code> (where the other image has id "image-id")...</li>
                 </ul>
+                It's just that simple!
             </p>
         </div>
         <img class="lowersrc" data-copy="head" data-text="(settings copied from header)" />
