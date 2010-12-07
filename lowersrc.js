@@ -55,11 +55,10 @@
             return mergeObj( settings, getAttr( image ) );
         },
         createImage: function( image ) {
-            var _this = this,
-                canvas = document.createElement( "canvas" ),
+            var canvas = document.createElement( "canvas" ),
                 settings = this.getSettings( image ),
                 def = function( name, method ) { 
-                    if(!method){
+                    if( ! method ){
                         return settings[ name ];
                     }
                     return method[ settings[ name ] ];
