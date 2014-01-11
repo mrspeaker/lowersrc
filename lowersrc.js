@@ -9,9 +9,9 @@
 */
 (function(){
     /* Run onload */
-    window.addEventListener( "load", function(){
+    $(window).load( function() {
         lowersrc.run();
-    }, false );
+    });
     
     // 
     var defaultAttrs = {
